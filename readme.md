@@ -61,126 +61,141 @@ While tdast could be used to represent most tabular data, it is best used with s
 
 ```ts
 interface Parent extends UnistParent {
-  children: Array<Row | Column | Cell>;
+  /** Array of child nodes */
+  children: Array<Row | Cell | Column>;
+  /** Additional data maybe attached. */
+  data?: Data;
 }
 ```
 
-**Parent** ([**UnistParent**][dfn-unist-parent]) represents a node in tdast containing other nodes (said to be children).
+`Parent` ([`UnistParent`][dfn-unist-parent]) is an abstract node containing other nodes (said to be children).
 
-Its content is limited to only other tdast content.
+This node is not used directly in tdast and is defined as an abstract interface.
 
 ### `Literal`
 
 ```ts
 interface Literal extends UnistLiteral {
-  value: string;
+  /** Primary data value of a literal node. Loosely typed to `any` for convenience. */
+  value: any;
+  /** Additional data maybe attached. */
+  data?: Data;
 }
 ```
 
-**Literal** ([**UnistLiteral**][dfn-unist-literal]) represents a node in tdast containing a value.
+`Literal` ([`UnistLiteral`][dfn-unist-literal]) is an abstract node in containing a value.
 
-Its value field is a string.
+This node is not used directly in tdast and is defined as an abstract interface.
 
 ### `Table`
 
 ```ts
 interface Table extends Parent {
+  /** Table node type. */
   type: 'table';
-  children: Array<Row>;
+  /** Can only contain Rows for children. */
+  children: Row[];
 }
 ```
 
-**Table** ([**Parent**][parent]) represents the node that holds all tabular data, explicitly [**row**][row] nodes.
+`Table` ([`Parent`][parent]) represents the node that holds all tabular data with [`Row`][row] nodes.
 
-**Table** can be used as the [root][dfn-unist-root] of a [tree][dfn-unist-tree], never as a [child][dfn-unist-child].
+`Table` can be used as the [root][dfn-unist-root] of a [tree][dfn-unist-tree], but never as a [child][dfn-unist-child].
 
 
 ### `Row`
 
 ```ts
 interface Row extends Parent {
+  /** Row node type. */
   type: 'row';
+  /** Index of Row in relation to other Rows in a Table. */
   index: number;
-  children: Array<Column | Cell>;
+  /** Can only contain Cells or Columns for children. */
+  children: Array<Cell | Column>;
 }
 ```
 
-**Row** ([**Parent**][parent]) holds literal nodes containing data, explicitly [**column**][column] or [**cell**][cell] nodes.
+`Row` ([`Parent`][parent]) holds literal nodes that contain data, such as [`Column`][column] or [`Cell`][cell] nodes.
 
-**Row** contains an `index` field that tracks its relative position with other rows under a [**table**][table].
+`Row` contains an `index` field that tracks its relative position with other rows under a [`Table`][table].
 
 ### `Cell`
 
 ```ts
 interface Cell extends Literal {
+  /** Cell node type. */
   type: 'cell';
-  value: string;
-  data?: any;
+  /** Tracks which Column the Cell belongs to */
+  columnIndex: number;
+  /** Tracks which Row the Cell belongs to */
+  rowIndex: number
 }
 ```
 
-**Cell** ([**Literal**][literal]) represents the intersection of a [**row**][row] and [**column**][column] of a table.  Its primary data/value is represented in the `value` property.
+`Cell` ([`Literal`][literal]) represents the intersection of a [`Row`][row] and [`Column`][column] of a [`Table`][table].  This intersection information is stored on the `columnIndex` and `rowIndex` properties.
 
-It can also contain attach additional data (not relevant to tdast) under the optional `data` property.
+Its primary data is stored on the `value` property.  `Cell` can also contain attach additional data (not relevant to tdast) under the optional `data` property.
 
 ### `Column`
 
 ```ts
-interface Column extends Cell {
+interface Column extends Literal {
+  /** Column node type. */
   type: 'column';
+  /** Display label of a column. */
   label: string;
+  /** Index of Column in relation to other Columns in a Table. */
   index: number;
-  dataType?: string;  // e.g. 'string' | 'number' | 'boolean' | 'null' | 'undefined' | 'nan'
+  /** Optional data type useful to determine data types of Cells matching the Column. */
+  dataType?: string;
 }
 ```
 
-**Column** ([**Cell**][cell]) is a [**cell**][cell] that is usually reserved in the first [**row**][row] of a [**table**][table].  Its primary data/key is represented in the `value` property.  It should have a display `label` specified as a string.
+`Column` ([`Literal`][literal]) is usually reserved in the first [`Row`][row] of a [`Table`][table].
 
-**Column** can optionally specify the `dataType` property, which informs the data types applied to [**cells**][cell] in a [**row**][row].
+`Column` contains an `index` field that tracks its relative position with other columns under a [`Table`][table].  Its primary data is represented in the `value` property.  It should have a display `label` specified as a string.
 
-**Column** contains an `index` field that tracks its relative position with other columns under a [**table**][table].
+`Column` can optionally specify the `dataType` property, which informs the data types applied to [`Cell`s][cell] in a [`Row`][row].
+
 
 ## Glossary
 
+- **`ast`**: a data structure representing source content as an abstract syntax tree.
 - **`cell`**: the intersection of a table row and column.  A cell contains data.
-- **`column`**: a table column contains cells.  A column should define the `dataType` of cells under it.  The cardinality of a column is equal to the number of rows in a table.
-- **`csv`**: comma-separated values file/content.
+- **`column`**: a table column provides definitions for cells in subsequent rows.  A column should define the `dataType` of cells under it.  The cardinality of a column is equal to the number of rows in a table.
+- **`csv`**: a common tabular data format that uses comma-separated values for delimiting values.
 - **`dataType`**: refers to the data type a table cell assumes.  This is usually defined by a table column.
-- **`hast`**: hypertext abstract syntax tree.  See the official [spec][hast] for more details.
-- **`mdast`**: markdown abstract syntax tree.  See the official [spec][mdast] for more details.
 - **`row`**: a table row contains cells.  The cardinality of a row is equal to the number of columns in a table.  The `dataType` of each cell should assume what is prescribed by the columns.
 - **`table`**: an arrangement of data in rows and columns.
 - **`tdast`**: represent tabular data as an abstract syntax tree with tdast.
+- **`unist`**: [universal syntax tree][unist] that tdast is based on.
 
 
 ## List of utilities
 
 > Note: The following utilities are a work in progress. They will be linked when implemented.
 
-- `tdast-util-from-object`: parse from JS object to tdast
+- `tdast-util-from-array`: parse from JS array to tdast
 - `tdast-util-from-csv`: parse from CSV to tdast
-- `tdast-util-from-json`: parse from JSON to tdast
+- `tdast-util-from-json`: parse from JSON (array form) to tdast
 - `tdast-util-to-hast-table`: transform tdast to a hast table node
 - `tdast-util-to-html-table`: serialize tdast to a HTML table
 - `tdast-util-to-markdown-table`: serialize tdast to a markdown table
 - `tdast-util-to-csv`: serialize tdast to CSV
-- `tdast-util-to-object`: transform tdast to JS object, which can be manipulated externally and read back with `tdast-util-from-object`.
-- `tdast-util-to-json`: serialize tdast to JSON
-- `tdast-util-find-cells`: return cell nodes that pass a provided row/column test.
-- `tdast-util-reduce`: compute a reduced value on rows/columns with the provided reducer.
-- `tdast-util-filter`: filter/drop rows/columns that pass a test.
+- `tdast-util-to-array`: transform tdast to JS array, which can be manipulated externally and read back with `tdast-util-from-array`.
+- `tdast-util-to-json`: serialize tdast to JSON (array form)
+- `tdast-util-select-cells`: return cell nodes that pass a provided test.
+- `tdast-util-reduce`: compute a reduced value on rows/columns using the provided reducer.
+- `tdast-util-filter`: filter rows/columns/cells that pass a test.
 - `tdast-util-sort`: sort rows/columns based on a sorting function
 
 
 ## Related
-- [unist][]
-    — Universal Syntax Tree format
-- [hast][]
-    — Hypertext Abstract Syntax Tree format
-- [mdast][]
-    — Markdown Abstract Syntax Tree format
-- [nlcst][]
-    — Natural Language Concrete Syntax Tree format
+- [unist][]: Universal Syntax Tree format
+- [hast][]: Hypertext Abstract Syntax Tree format
+- [mdast][]: Markdown Abstract Syntax Tree format
+- [nlcst][]: Natural Language Concrete Syntax Tree format
 
 
 ## License
