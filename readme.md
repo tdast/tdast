@@ -42,7 +42,7 @@ utilities][unist-utilities] for working with compliant syntax trees in
 JavaScript.  However, tdast is not limited to JavaScript and can be used in other programming
 languages.
 
-tdast relates to the [unified][] project in that tdast syntax trees follow the unist spec and is compatible with utilities throughout its ecosystem.
+tdast relates to the [unified][] project in that tdast syntax trees follow the [unist][] spec and is compatible with utilities throughout its ecosystem.
 
 ### Scope
 
@@ -174,28 +174,20 @@ interface Column extends Literal {
 
 ## List of utilities
 
-> Note: The following utilities are a work in progress. They will be linked when implemented.
-
-- `tdast-util-from-array`: parse from JS array to tdast
-- `tdast-util-from-csv`: parse from CSV to tdast
-- `tdast-util-from-json`: parse from JSON (array form) to tdast
-- `tdast-util-to-hast-table`: transform tdast to a hast table node
-- `tdast-util-to-html-table`: serialize tdast to a HTML table
-- `tdast-util-to-markdown-table`: serialize tdast to a markdown table
-- `tdast-util-to-csv`: serialize tdast to CSV
-- `tdast-util-to-array`: transform tdast to JS array, which can be manipulated externally and read back with `tdast-util-from-array`.
-- `tdast-util-to-json`: serialize tdast to JSON (array form)
-- `tdast-util-select-cells`: return cell nodes that pass a provided test.
-- `tdast-util-reduce`: compute a reduced value on rows/columns using the provided reducer.
-- `tdast-util-filter`: filter rows/columns/cells that pass a test.
-- `tdast-util-sort`: sort rows/columns based on a sorting function
+- [`tdastscript`][tdastscript]: utility to create tdast trees.
+- [`tdast-util-from-array`][tdast-util-from-array]: transform from JS array to tdast
+- [`tdast-util-from-csv`][tdast-util-from-csv]: parse from CSV to tdast ([RFC-4180][] compliant)
+- [`tdast-util-to-array`][tdast-util-to-array]: transform tdast to JS array, which can be manipulated externally and read back with `tdast-util-from-array`.
+- [`tdast-util-to-csv`][tdast-util-to-csv]: serialize tdast to CSV ([RFC-4180][] compliant)
+- [`tdast-util-to-hast-table`][tdast-util-to-hast-table]: transform tdast to a [hast][] table node
+- [`tdast-util-to-html-table`][tdast-util-to-html-table]: serialize tdast to a HTML table
+- [`tdast-util-to-json`][tdast-util-to-json]: serialize tdast to JSON (array form)
+- [`tdast-util-to-markdown-table`][tdast-util-to-markdown-table]: serialize tdast to a markdown table
 
 
 ## Related
 - [unist][]: Universal Syntax Tree format
-- [hast][]: Hypertext Abstract Syntax Tree format
-- [mdast][]: Markdown Abstract Syntax Tree format
-- [nlcst][]: Natural Language Concrete Syntax Tree format
+- [tdastscript][]: utility to create tdast trees.
 
 
 ## License
@@ -219,10 +211,18 @@ interface Column extends Literal {
 [hast]: https://github.com/syntax-tree/hast
 [license]: https://creativecommons.org/licenses/by/4.0/
 [javascript]: https://www.ecma-international.org/ecma-262/9.0/index.html
-[mdast]: https://github.com/syntax-tree/mdast
-[nlcst]: https://github.com/syntax-tree/nlcst
 [releases]: https://github.com/tdast/tdast/releases
+[rfc-4180]: https://tools.ietf.org/html/rfc4180
 [syntax-tree]: https://github.com/syntax-tree/unist#syntax-tree
+[tdastscript]: https://github.com/tdast/tdastscript
+[tdast-util-from-array]: https://github.com/tdast/tdast-util-from-array
+[tdast-util-from-csv]: https://github.com/tdast/tdast-util-from-csv
+[tdast-util-to-array]: https://github.com/tdast/tdast-util-to-array
+[tdast-util-to-csv]: https://github.com/tdast/tdast-util-to-csv
+[tdast-util-to-hast-table]: https://github.com/tdast/tdast-util-to-hast-table
+[tdast-util-to-html-table]: https://github.com/tdast/tdast-util-to-html-table
+[tdast-util-to-json]: https://github.com/tdast/tdast-util-to-json
+[tdast-util-to-markdown-table]: https://github.com/tdast/tdast-util-to-markdown-table
 [unified]: https://github.com/unifiedjs/unified
 [unist]: https://github.com/syntax-tree/unist
 [unist-utilities]: https://github.com/syntax-tree/unist#list-of-utilities
